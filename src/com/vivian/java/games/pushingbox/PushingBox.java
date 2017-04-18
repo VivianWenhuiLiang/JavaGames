@@ -1,6 +1,11 @@
-package com.xuzhi.java.games;
+package com.vivian.java.games.pushingbox;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class PushingBox {
     public static final int OBSTACLE = 4;
@@ -25,9 +30,7 @@ public class PushingBox {
     }
 
     public void load(String fileName) {
-        try {
-            File f = new File(fileName);
-            BufferedReader b = new BufferedReader(new FileReader(f));
+        try (BufferedReader b = new BufferedReader(new FileReader(new File(fileName)))) {
             String line;
 
             int i = 0;
@@ -63,41 +66,38 @@ public class PushingBox {
 
                 i++;
             }
-            b.close();
         } catch (IOException e) {
             throw new IllegalArgumentException("Unable to initialize game with file " + fileName, e);
         }
     }
 
-
     public void save(String fileName) {
-        try {
-            StringBuilder sb = new StringBuilder();
-            // 第一行为PushingBox 行数 列数
-            sb.append("PushingBox ").append(state.length).append(' ').append(state[0].length).append(System.lineSeparator());
-            // 保存state
-            sb.append("State").append(System.lineSeparator());
-            for (int i = 0; i < state.length; i++) {
-                for (int j = 0; j < state[i].length; j++) {
-                    if (BLANK != state[i][j]) {
-                        sb.append(i).append(' ').append(j).append(' ').append(state[i][j]).append(System.lineSeparator());
-                    }
+        StringBuilder sb = new StringBuilder();
+        // 第一行为PushingBox 行数 列数
+        sb.append("PushingBox ").append(state.length).append(' ').append(state[0].length)
+                .append(System.lineSeparator());
+        // 保存state
+        sb.append("State").append(System.lineSeparator());
+        for (int i = 0; i < state.length; i++) {
+            for (int j = 0; j < state[i].length; j++) {
+                if (BLANK != state[i][j]) {
+                    sb.append(i).append(' ').append(j).append(' ').append(state[i][j]).append(System.lineSeparator());
                 }
             }
-            // 保存destination
-            sb.append("Destination").append(System.lineSeparator());
-            for (int i = 0; i < destination.length; i++) {
-                for (int j = 0; j < destination[i].length; j++) {
-                    if (DESTINATION == destination[i][j]) {
-                        sb.append(i).append(' ').append(j).append(' ').append(destination[i][j]).append(System.lineSeparator());
-                    }
+        }
+        // 保存destination
+        sb.append("Destination").append(System.lineSeparator());
+        for (int i = 0; i < destination.length; i++) {
+            for (int j = 0; j < destination[i].length; j++) {
+                if (DESTINATION == destination[i][j]) {
+                    sb.append(i).append(' ').append(j).append(' ').append(destination[i][j])
+                            .append(System.lineSeparator());
                 }
             }
+        }
 
-            File f = new File(fileName);
-            BufferedWriter b = new BufferedWriter(new FileWriter(f));
+        try (BufferedWriter b = new BufferedWriter(new FileWriter(new File(fileName)))) {
             b.write(sb.toString());
-            b.close(); // need to close BufferedWriter after done
         } catch (IOException e) {
             throw new IllegalArgumentException("Unable to save game to file " + fileName, e);
         }
@@ -105,21 +105,21 @@ public class PushingBox {
 
     void draw_point(int n) {
         switch (n) {
-            case BLANK:
-                System.out.print("|   ");
-                break;
-            case PLAYER:
-                System.out.print("| \uc6c3 ");
-                break;
-            case BOX:
-                System.out.print("| \u25A0 ");
-                break;
-            case DESTINATION:
-                System.out.print("| \u2605 ");
-                break;
-            case OBSTACLE:
-                System.out.print("||||");
-                break;
+        case BLANK:
+            System.out.print("|   ");
+            break;
+        case PLAYER:
+            System.out.print("| \uc6c3 ");
+            break;
+        case BOX:
+            System.out.print("| \u25A0 ");
+            break;
+        case DESTINATION:
+            System.out.print("| \u2605 ");
+            break;
+        case OBSTACLE:
+            System.out.print("||||");
+            break;
         }
     }
 
@@ -147,7 +147,7 @@ public class PushingBox {
         x[i][j] = n;
     }
 
-    int get_a_x(int x[][]) {// get player's x location
+    int get_a_x(int x[][]) { // get player's x location
         int i, j;
         for (i = 0; i < x.length; i++) {
             for (j = 0; j < x[i].length; j++) {
@@ -294,7 +294,8 @@ public class PushingBox {
                 break;
             }
 
-            System.out.println("请输入命令以移动 (w - UP, a - LEFT, s - DOWN, d - RIGHT, x - save game, z - load game, r - reset game, q - quit game):");
+            System.out.println(
+                    "请输入命令以移动 (w - UP, a - LEFT, s - DOWN, d - RIGHT, x - save game, z - load game, r - reset game, q - quit game):");
             char c = (char) System.in.read();
             System.in.skip(System.in.available());
 
@@ -308,7 +309,7 @@ public class PushingBox {
                 p = new PushingBox("saved.pb");
             } else if (c == RESET) {
                 p = new PushingBox("default.pb");
-            }  else if (c == QUIT) {
+            } else if (c == QUIT) {
                 break;
             } else {
                 System.out.println("只能输入wasdxzrq其中之一");
