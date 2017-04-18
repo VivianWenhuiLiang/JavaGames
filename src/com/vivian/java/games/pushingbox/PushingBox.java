@@ -1,4 +1,4 @@
-package com.xuzhi.java.games;
+package com.vivian.java.games.pushingbox;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -75,7 +75,7 @@ public class PushingBox {
 		StringBuilder sb = new StringBuilder();
 		// 第一行为PushingBox 行数 列数
 		sb.append("PushingBox ").append(state.length).append(' ').append(state[0].length)
-				.append(System.lineSeparator());
+		        .append(System.lineSeparator());
 		// 保存state
 		sb.append("State").append(System.lineSeparator());
 		for (int i = 0; i < state.length; i++) {
@@ -91,7 +91,7 @@ public class PushingBox {
 			for (int j = 0; j < destination[i].length; j++) {
 				if (DESTINATION == destination[i][j]) {
 					sb.append(i).append(' ').append(j).append(' ').append(destination[i][j])
-							.append(System.lineSeparator());
+					        .append(System.lineSeparator());
 				}
 			}
 		}
@@ -295,7 +295,7 @@ public class PushingBox {
 			}
 
 			System.out.println(
-					"请输入命令以移动 (w - UP, a - LEFT, s - DOWN, d - RIGHT, x - save game, z - load game, r - reset game, q - quit game):");
+			        "请输入命令以移动 (w - UP, a - LEFT, s - DOWN, d - RIGHT, x - save game, z - load game, r - reset game, q - quit game):");
 			char c = (char) System.in.read();
 			System.in.skip(System.in.available());
 
