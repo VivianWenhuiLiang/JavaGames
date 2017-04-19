@@ -8,16 +8,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class PushingBox {
-    public enum Element {
+    private enum Element {
         BLANK(0), PLAYER(1), BOX(2), DESTINATION(3), OBSTACLE(4);
-        int el;
+        int value;
 
-        Element(int el) {
-            this.el = el;
+        Element(int value) {
+            this.value = value;
         }
 
         public int getEl() {
-            return el;
+            return value;
 
         }
 
@@ -31,7 +31,7 @@ public class PushingBox {
         }
     }
 
-    public enum Operation {
+    private enum Operation {
         UP('w'), LEFT('a'), RIGHT('d'), DOWN('s'), SAVE('x'), LOAD('z'), RESET('r'), QUIT('q');
         char ch;
 
@@ -194,10 +194,10 @@ public class PushingBox {
         return -1;
     }
 
-    void move(char c) {
+    void move(char operation) {
         int i = get_a_x(state);
         int j = get_a_y(state);
-        if (c == Operation.LEFT.getCh()) {
+        if (operation == Operation.LEFT.getCh()) {
             if (j == 0) {
                 return;
             }
@@ -218,7 +218,7 @@ public class PushingBox {
                 state[i][j - 1] = state[i][j];
                 state[i][j] = Element.BLANK.getEl();
             }
-        } else if (c == Operation.UP.getCh()) {
+        } else if (operation == Operation.UP.getCh()) {
             if (i == 0) {
                 return;
             }
@@ -239,7 +239,7 @@ public class PushingBox {
                 state[i - 1][j] = state[i][j];
                 state[i][j] = Element.BLANK.getEl();
             }
-        } else if (c == Operation.RIGHT.getCh()) {
+        } else if (operation == Operation.RIGHT.getCh()) {
             if (j == state[i].length - 1) {
                 return;
             }
@@ -260,7 +260,7 @@ public class PushingBox {
                 state[i][j + 1] = state[i][j];
                 state[i][j] = Element.BLANK.getEl();
             }
-        } else if (c == Operation.DOWN.getCh()) {
+        } else if (operation == Operation.DOWN.getCh()) {
             if (i == state.length - 1) {
                 return;
             }
