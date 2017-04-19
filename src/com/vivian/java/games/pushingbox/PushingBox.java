@@ -8,19 +8,41 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class PushingBox {
-    public static final int OBSTACLE = 4;
-    public static final int DESTINATION = 3;
-    public static final int BOX = 2;
-    public static final int PLAYER = 1;
-    public static final int BLANK = 0;
-    public static final char UP = 'w';
-    public static final char LEFT = 'a';
-    public static final char RIGHT = 'd';
-    public static final char DOWN = 's';
-    public static final char SAVE = 'x';
-    public static final char LOAD = 'z';
-    public static final char RESET = 'r';
-    public static final char QUIT = 'q';
+    public enum Element {
+        BLANK(0), PLAYER(1), BOX(2), DESTINATION(3), OBSTACLE(4);
+        int el;
+
+        Element(int el) {
+            this.el = el;
+        }
+
+        public int getEl() {
+            return el;
+
+        }
+
+        public static Element fromInt(int n) {
+            for (Element e : Element.values()) {
+                if (n == e.getEl()) {
+                    return e;
+                }
+            }
+            throw new IllegalArgumentException("Invalid element value: " + n);
+        }
+    }
+
+    public enum Operation {
+        UP('w'), LEFT('a'), RIGHT('d'), DOWN('s'), SAVE('x'), LOAD('z'), RESET('r'), QUIT('q');
+        char ch;
+
+        Operation(char ch) {
+            this.ch = ch;
+        }
+
+        public char getCh() {
+            return ch;
+        }
+    }
 
     private int[][] state;
     private int[][] destination;
@@ -80,7 +102,7 @@ public class PushingBox {
         sb.append("State").append(System.lineSeparator());
         for (int i = 0; i < state.length; i++) {
             for (int j = 0; j < state[i].length; j++) {
-                if (BLANK != state[i][j]) {
+                if (Element.BLANK.getEl() != state[i][j]) {
                     sb.append(i).append(' ').append(j).append(' ').append(state[i][j]).append(System.lineSeparator());
                 }
             }
@@ -89,7 +111,7 @@ public class PushingBox {
         sb.append("Destination").append(System.lineSeparator());
         for (int i = 0; i < destination.length; i++) {
             for (int j = 0; j < destination[i].length; j++) {
-                if (DESTINATION == destination[i][j]) {
+                if (Element.DESTINATION.getEl() == destination[i][j]) {
                     sb.append(i).append(' ').append(j).append(' ').append(destination[i][j])
                             .append(System.lineSeparator());
                 }
@@ -104,7 +126,8 @@ public class PushingBox {
     }
 
     void draw_point(int n) {
-        switch (n) {
+        Element e = Element.fromInt(n);
+        switch (e) {
         case BLANK:
             System.out.print("|   ");
             break;
@@ -151,7 +174,7 @@ public class PushingBox {
         int i, j;
         for (i = 0; i < x.length; i++) {
             for (j = 0; j < x[i].length; j++) {
-                if (state[i][j] == PLAYER) {
+                if (state[i][j] == Element.PLAYER.getEl()) {
                     return i;
                 }
             }
@@ -163,7 +186,7 @@ public class PushingBox {
         int i, j;
         for (i = 0; i < x.length; i++) {
             for (j = 0; j < x[i].length; j++) {
-                if (state[i][j] == PLAYER) {
+                if (state[i][j] == Element.PLAYER.getEl()) {
                     return j;
                 }
             }
@@ -174,89 +197,89 @@ public class PushingBox {
     void move(char c) {
         int i = get_a_x(state);
         int j = get_a_y(state);
-        if (c == LEFT) {
+        if (c == Operation.LEFT.getCh()) {
             if (j == 0) {
                 return;
             }
-            if (state[i][j - 1] == OBSTACLE) {
+            if (state[i][j - 1] == Element.OBSTACLE.getEl()) {
                 return;
             }
-            if (state[i][j - 1] == BOX) {
+            if (state[i][j - 1] == Element.BOX.getEl()) {
                 if (j - 1 == 0) {
                     return;
                 }
-                if (state[i][j - 2] == BOX || state[i][j - 2] == OBSTACLE) {
+                if (state[i][j - 2] == Element.BOX.getEl() || state[i][j - 2] == Element.OBSTACLE.getEl()) {
                     return;
                 }
                 state[i][j - 2] = state[i][j - 1];
                 state[i][j - 1] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             } else {
                 state[i][j - 1] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             }
-        } else if (c == UP) {
+        } else if (c == Operation.UP.getCh()) {
             if (i == 0) {
                 return;
             }
-            if (state[i - 1][j] == OBSTACLE) {
+            if (state[i - 1][j] == Element.OBSTACLE.getEl()) {
                 return;
             }
-            if (state[i - 1][j] == BOX) {
+            if (state[i - 1][j] == Element.BOX.getEl()) {
                 if (i - 1 == 0) {
                     return;
                 }
-                if (state[i - 2][j] == BOX || state[i - 2][j] == OBSTACLE) {
+                if (state[i - 2][j] == Element.BOX.getEl() || state[i - 2][j] == Element.OBSTACLE.getEl()) {
                     return;
                 }
                 state[i - 2][j] = state[i - 1][j];
                 state[i - 1][j] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             } else {
                 state[i - 1][j] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             }
-        } else if (c == RIGHT) {
+        } else if (c == Operation.RIGHT.getCh()) {
             if (j == state[i].length - 1) {
                 return;
             }
-            if (state[i][j + 1] == OBSTACLE) {
+            if (state[i][j + 1] == Element.OBSTACLE.getEl()) {
                 return;
             }
-            if (state[i][j + 1] == BOX) {
+            if (state[i][j + 1] == Element.BOX.getEl()) {
                 if (j + 1 == state[i].length - 1) {
                     return;
                 }
-                if (state[i][j + 2] == BOX || state[i][j + 2] == OBSTACLE) {
+                if (state[i][j + 2] == Element.BOX.getEl() || state[i][j + 2] == Element.OBSTACLE.getEl()) {
                     return;
                 }
                 state[i][j + 2] = state[i][j + 1];
                 state[i][j + 1] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             } else {
                 state[i][j + 1] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             }
-        } else if (c == DOWN) {
+        } else if (c == Operation.DOWN.getCh()) {
             if (i == state.length - 1) {
                 return;
             }
-            if (state[i + 1][j] == OBSTACLE) {
+            if (state[i + 1][j] == Element.OBSTACLE.getEl()) {
                 return;
             }
-            if (state[i + 1][j] == BOX) {
+            if (state[i + 1][j] == Element.BOX.getEl()) {
                 if (i + 1 == state.length - 1) {
                     return;
                 }
-                if (state[i + 2][j] == BOX || state[i + 2][j] == OBSTACLE) {
+                if (state[i + 2][j] == Element.BOX.getEl() || state[i + 2][j] == Element.OBSTACLE.getEl()) {
                     return;
                 }
                 state[i + 2][j] = state[i + 1][j];
                 state[i + 1][j] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             } else {
                 state[i + 1][j] = state[i][j];
-                state[i][j] = BLANK;
+                state[i][j] = Element.BLANK.getEl();
             }
         }
     }
@@ -265,8 +288,8 @@ public class PushingBox {
         int i, j;
         for (i = 0; i < state.length; i++) {
             for (j = 0; j < state[i].length; j++) {
-                if (destination[i][j] == DESTINATION && state[i][j] == BLANK) {
-                    state[i][j] = DESTINATION;
+                if (destination[i][j] == Element.DESTINATION.getEl() && state[i][j] == Element.BLANK.getEl()) {
+                    state[i][j] = Element.DESTINATION.getEl();
                 }
             }
         }
@@ -277,7 +300,7 @@ public class PushingBox {
         int i, j;
         for (i = 0; i < state.length; i++) {
             for (j = 0; j < state[i].length; j++) {
-                if (destination[i][j] == DESTINATION && state[i][j] != BOX) {
+                if (destination[i][j] == Element.DESTINATION.getEl() && state[i][j] != Element.BOX.getEl()) {
                     bl = false;
                 }
             }
@@ -299,17 +322,18 @@ public class PushingBox {
             char c = (char) System.in.read();
             System.in.skip(System.in.available());
 
-            if (c == UP || c == LEFT || c == DOWN || c == RIGHT) {
+            if (c == Operation.UP.getCh() || c == Operation.LEFT.getCh() || c == Operation.DOWN.getCh()
+                    || c == Operation.RIGHT.getCh()) {
                 p.move(c);
                 p.match();
-            } else if (c == SAVE) {
+            } else if (c == Operation.SAVE.getCh()) {
                 p.save("saved.pb");
                 System.out.println("Game saved to saved.pb. ");
-            } else if (c == LOAD) {
+            } else if (c == Operation.LOAD.getCh()) {
                 p = new PushingBox("saved.pb");
-            } else if (c == RESET) {
+            } else if (c == Operation.RESET.getCh()) {
                 p = new PushingBox("default.pb");
-            } else if (c == QUIT) {
+            } else if (c == Operation.QUIT.getCh()) {
                 break;
             } else {
                 System.out.println("只能输入wasdxzrq其中之一");
